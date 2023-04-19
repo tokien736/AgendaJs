@@ -1,0 +1,10 @@
+.listado-tarea{
+
+    display: flex;
+    flex-direction: column;
+}
+.tarea{
+    display: flex;
+    flex-direction: row
+    ;
+}
