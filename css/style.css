@@ -35,3 +35,33 @@
     content: "\2022";
     margin-right: 8px;
 }
+table {
+    border: 1px solid #ddd !important;
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin-bottom: 20px !important; 
+}
+  
+  /* Agrega un borde a las celdas de la tabla */
+td, th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+  
+  /* Agrega un color de fondo gris claro a las filas alternas de la tabla */
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+button {
+    background-color: #007bff; /* Establece el color de fondo del botón en azul */
+    border: 2px solid #007bff !important; /* Establece el borde del botón en azul */
+    color: #fff; /* Establece el color del texto en blanco */
+    cursor: pointer; /* Cambia el cursor a un puntero cuando se coloca sobre el botón */
+    font-size: 16px; /* Establece el tamaño de fuente en 16 píxeles */
+    padding: 5px 10px; /* Agrega un relleno de 10 píxeles arriba y abajo, y 20 píxeles a los lados */
+    border-radius: 5px !important;
+}
+button:hover {
+    background-color: #fff; /* Cambia el color de fondo del botón a blanco */
+    color: #007bff; /* Cambia el color del texto a azul */
+}
