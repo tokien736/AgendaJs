@@ -13,11 +13,32 @@ class Agenda {
       if (index !== -1) {
         this.contactos.splice(index, 1);
       }
+    }  
+    buscarContacto(nombre, telefono) {
+      const contactoEncontrado = this.contactos.find((contacto) => contacto.nombre === nombre);
+
+      if (contactoEncontrado) {
+        return contactoEncontrado;
+      }
+  
+      const contactosLocalStorage = JSON.parse(localStorage.getItem("contactos"));
+      if (contactosLocalStorage) {
+        const contactoLocalStorageEncontrado = contactosLocalStorage.find((contacto) => contacto.nombre === nombre);
+        if (contactoLocalStorageEncontrado) {
+          return contactoLocalStorageEncontrado;
+        }
+      }
+    }
+    cargarContactos() {
+      const contactosLocalStorage = JSON.parse(localStorage.getItem('contactos'));
+      if (contactosLocalStorage) {
+        this.contactos = contactosLocalStorage;
+      }
+    }
+    guardarContactos() {
+      localStorage.setItem('contactos', JSON.stringify(this.contactos));
     }
   
-    buscarContacto(nombre) {
-      return this.contactos.find((contacto) => contacto.nombre === nombre);
-    }
 }
  
 class Contacto {
@@ -31,6 +52,8 @@ class Contacto {
         this.telefono = telefono;
     }
 }
+
+
 //Recuperamos los elementos del html
 const nombre = document.getElementById("nombre")
 const ApellidoPaterno = document.getElementById("apellidoP")
@@ -39,6 +62,8 @@ const fechaNacimiento = document.getElementById("fechaNac")
 const email = document.getElementById("email")
 const direccion = document.getElementById("direccion")
 const telefono = document.getElementById("telefono")
+
+
 //Recuperamos el boton
 const btnAgregar = document.getElementById("agregar")
 const listaContactos = document.getElementById("listaContactos")
@@ -47,12 +72,14 @@ let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNa
 const contacForm = document.getElementById('form-contactos');
 //Cuando haces click en Agregar
 btnAgregar.onclick = () => {
-    let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNac.value,email.value,direccion.value,telefono.value) 
+    let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNac.value,email.value,direccion.value,telefono.value)
     miAgenda.agregarContacto(contacto)
-    // Guardamos los contactos en un localStore
-    let contactos = JSON.parse(localStorage.getItem('contactos')) || [];  
-    contactos.push(contacto);
-    localStorage.setItem('contactos', JSON.stringify(contactos));
+    miAgenda.guardarContactos(contacto)
+    //miAgenda.cargarContactos(contacto)
+    //Guardamos los contactos en un localStore
+    //let contactos = JSON.parse(localStorage.getItem('contactos')) || [];  
+    //contactos.push(contacto);
+    //localStorage.setItem('contactos', JSON.stringify(contactos));
     console.log(miAgenda)
     //Mostramos
     actualizarListaContactos()
@@ -153,4 +180,8 @@ function limpiarCajas() {
     document.getElementById('email').value = '';
     document.getElementById('direccion').value = '';
     document.getElementById('telefono').value = '';
+}
+function BuscarContac(  )
+{
+
 }
