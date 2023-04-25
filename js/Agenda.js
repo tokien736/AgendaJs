@@ -49,7 +49,8 @@ const contacForm = document.getElementById('form-contactos');
 btnAgregar.onclick = () => {
     let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNac.value,email.value,direccion.value,telefono.value) 
     miAgenda.agregarContacto(contacto)
-    let contactos = JSON.parse(localStorage.getItem('contactos')) || [];
+    // Guardamos los contactos en un localStore
+    let contactos = JSON.parse(localStorage.getItem('contactos')) || [];  
     contactos.push(contacto);
     localStorage.setItem('contactos', JSON.stringify(contactos));
     console.log(miAgenda)
