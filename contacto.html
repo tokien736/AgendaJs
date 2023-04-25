@@ -50,11 +50,15 @@
     <main>
         <div class="container my-5">
             <h2>Contactos:</h2>
-            <ul id="listaContactos" class="lista_Contactos">
-                <!-- aquí se mostrarán los contactos -->
-                
-            </ul>
-        </div>
+            <table id="contactos">
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Teléfono</th>
+              </tr>
+            </table>
+            <button onclick="descargarContactos()">Descargar contactos</button>
+          </div>
 
     </main>
 
@@ -72,8 +76,9 @@
     </footer>
 
     <!--Llamada a los archivos js-->
-    <script src="agenda.js"></script>
-    <script src="app.js"></script>
+    <script src="../AgendaJs/js/Agenda.js"></script>
+    <script src="../AgendaJs/js/Contactos.js"></script>
+    
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>   
 </body>
