@@ -1,10 +1,37 @@
-.listado-tarea{
+.lista_Contactos{
+    width: 1024px;
+    position: relative;
+    margin: 0 auto;
+    padding: 25px;
 
-    display: flex;
-    flex-direction: column;
 }
-.tarea{
-    display: flex;
-    flex-direction: row
-    ;
+.lista_Contactos li{
+    display: inline-block;
+    text-align: left;
+}
+.lista_Contactos .contact{
+    margin: 10px;
+    padding: 10px;
+    border-radius: 15px;
+    vertical-align: top;
+    box-sizing: border-box;
+    border: 2px solid #000;
+    border-radius: 10px;
+}
+.lista_Contactos .contact:hover{
+    border-color:#c78c19;
+}
+.lista_Contactos .contact:active{
+    border-color: #088c19;
+}
+.lista_Contactos .nomb{
+    text-align: center;
+}
+.lista_Contactos .telefono{
+    font-weight: bold;
+}
+
+.list-points li:before {
+    content: "\2022";
+    margin-right: 8px;
 }
