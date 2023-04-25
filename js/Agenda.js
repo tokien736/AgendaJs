@@ -14,7 +14,7 @@ class Agenda {
         this.contactos.splice(index, 1);
       }
     }
-  
+    // metodo buscar
     buscarContacto(nombre) {
       return this.contactos.find((contacto) => contacto.nombre === nombre);
     }
