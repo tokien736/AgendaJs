@@ -1,46 +1,40 @@
-const formularioBusqueda = document.querySelector('#buscar-contactos form');
-const resultadoBusqueda = document.querySelector('#resultado-busqueda');
+// Esperar a que se cargue el DOM
+document.addEventListener('DOMContentLoaded', () => {
+  // Obtener referencia al formulario y a la lista de resultados
+  const form = document.querySelector('form');
+  const resultadoBusqueda = document.querySelector('#resultado-busqueda');
 
-formularioBusqueda.addEventListener('submit', (event) => {
-  event.preventDefault();
+  // Agregar un listener para el evento submit del formulario
+  form.addEventListener('submit', (event) => {
+    // Prevenir la acción por defecto del formulario (que es refrescar la página)
+    event.preventDefault();
 
-  const nombreBusqueda = document.querySelector('#busqueda-nombre').value;
-  const telefonoBusqueda = document.querySelector('#busqueda-telefono').value;
+    // Obtener los valores de búsqueda ingresados por el usuario
+    const nombre = document.querySelector('#busqueda-nombre').value;
+    const telefono = document.querySelector('#busqueda-telefono').value;
 
-  // Buscar los contactos que coincidan con los valores de búsqueda
-  const contactosEncontrados = buscarContactos(nombreBusqueda, telefonoBusqueda);
+    // Obtener los contactos del localStorage y filtrarlos según los criterios de búsqueda
+    const contactos = JSON.parse(localStorage.getItem('contactos')) || [];
+    const resultados = contactos.filter((contacto) => {
+      return contacto.nombre.toLowerCase().includes(nombre.toLowerCase()) &&
+             contacto.telefono.includes(telefono);
+    });
 
-  // Mostrar los resultados en la interfaz de usuario
-  mostrarResultadosBusqueda(contactosEncontrados);
-});
-
-function buscarContactos(nombre, telefono) {
-  const contactos = JSON.parse(localStorage.getItem('contactos')) || [];
-  const contactosEncontrados = [];
-
-  for (const contacto of contactos) {
-    if (contacto.nombre.toLowerCase().includes(nombre.toLowerCase()) || contacto.telefono.includes(telefono)) {
-      contactosEncontrados.push(contacto);
-    }
-  }
-
-  return contactosEncontrados;
-}
-
-function mostrarResultadosBusqueda(contactos) {
-  resultadoBusqueda.innerHTML = '';
-
-  if (contactos.length === 0) {
-    const mensaje = document.createElement('li');
-    mensaje.textContent = 'No se encontraron resultados';
-    mensaje.classList.add('list-group-item');
-    resultadoBusqueda.appendChild(mensaje);
-  } else {
-    for (const contacto of contactos) {
+    // Limpiar la lista de resultados previos y mostrar los nuevos resultados
+    resultadoBusqueda.innerHTML = '';
+    if (resultados.length > 0) {
+      resultados.forEach((contacto) => {
+        const li = document.createElement('li');
+        li.classList.add('list-group-item');
+        li.innerText = `${contacto.nombre}-${contacto.apellidoP}-${contacto.apellidoM}-${contacto.fechaNac}-${contacto.email}-${contacto.direccion}-${contacto.telefono}`;
+        resultadoBusqueda.appendChild(li);
+      });
+    } else {
       const li = document.createElement('li');
-      li.textContent = `${contacto.nombre} - ${contacto.apellidoP} - ${contacto.apellidoM} - ${contacto.fechaNac} - ${contacto.email} - ${contacto.direccion} - ${contacto.telefono} `;
       li.classList.add('list-group-item');
+      li.innerText = 'No se encontraron resultados';
       resultadoBusqueda.appendChild(li);
     }
-  }
-}
+  });
+
+});
