@@ -1,4 +1,10 @@
 console.log("clock")
+import {
+  saveTask,getTasks,onGetContacto,deleteContacto,getContacto,editContacto,searchByName
+} from "./firebase.js";
+
+let editStatus = false;
+let id = "";
 class Agenda {
     constructor() {
       this.contactos = [];
@@ -43,149 +49,76 @@ const telefono = document.getElementById("telefono")
 const btnAgregar = document.getElementById("agregar")
 const listaContactos = document.getElementById("listaContactos")
 let miAgenda = new Agenda()
-let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNac.value,email.value,direccion.value,telefono.value) 
-const contacForm = document.getElementById('form-contactos');
-//Cuando haces click en Agregar
-btnAgregar.onclick = () => {
-    let contacto = new Contacto(nombre.value,apellidoP.value,apellidoM.value,fechaNac.value,email.value,direccion.value,telefono.value)
-    miAgenda.agregarContacto(contacto)
-    let contactos = JSON.parse(localStorage.getItem('contactos')) || [];
-    contactos.push(contacto);
-    localStorage.setItem('contactos', JSON.stringify(contactos));
-    console.log(miAgenda)
-    //Mostramos
-    actualizarListaContactos()
-    limpiarCajas()
-}
-function obtenerIdContacto(event) {
-  // obtener el elemento de la lista que contiene el botón "eliminar"
-  var botonEliminar = event.target;
-  var itemLista = botonEliminar.closest('.list-group-item');
-  //Terminamos
-  // verificar si itemLista no es null antes de acceder al atributo "nombre"
-  var id = null;
-  if (itemLista) {
-    id = parseInt(itemLista.getAttribute('nombre'));
-  }
-
-  return id;
-}
-function eliminarContacto(nombreContacto) {
-    // Encontrar el contacto a eliminar en el objeto Agenda
-    // obtener el identificador único del contacto
-    var id = obtenerIdContacto(event);
-
-    const contactoAEliminar = miAgenda.buscarContacto(nombreContacto);
-  
-    // Eliminar el contacto del objeto Agenda
-    miAgenda.eliminarContacto(contactoAEliminar);
-    // buscar el contacto en el local storage
-    var contactos = JSON.parse(localStorage.getItem('contactos'));
-    var index = contactos.findIndex(c => c.id === id);
-
-    // eliminar el contacto del local storage
-    contactos.splice(index, 1);
-    localStorage.setItem('contactos', JSON.stringify(contactos));  
-    // Actualizar la lista de contactos en la interfaz de usuario
-    actualizarListaContactos();
-    limpiarCajas();
-}
-function editarContacto(nombre, apellidoP, apellidoM, fechaNac, email, direccion, telefono) {
-  contacForm['nombre'].value = nombre;
-  contacForm['apellidoP'].value = apellidoP;
-  contacForm['apellidoM'].value = apellidoM;
-  contacForm['fechaNac'].value = fechaNac;
-  contacForm['email'].value = email;
-  contacForm['direccion'].value = direccion;
-  contacForm['telefono'].value = telefono;
-
-  // Agregar un botón "Guardar"
-  const guardarBtn = document.createElement('button');
-  guardarBtn.textContent = 'Guardar';
-  guardarBtn.classList.add('btn', 'btn-primary', 'mt-2');
-  guardarBtn.addEventListener('click', (event) => {
-    event.preventDefault();
-    const nombreEditado = contacForm['nombre'].value;
-    const apellidoPEditado = contacForm['apellidoP'].value;
-    const apellidoMEditado = contacForm['apellidoM'].value;
-    const fechaNacEditado = contacForm['fechaNac'].value;
-    const emailEditado = contacForm['email'].value;
-    const direccionEditado = contacForm['direccion'].value;
-    const telefonoEditado = contacForm['telefono'].value;
-
-    // Encontrar el contacto a editar en el objeto Agenda
-    const contactoAEditar = miAgenda.buscarContacto(nombre);
-
-    // Actualizar los valores del contacto editado
-    contactoAEditar.nombre = nombreEditado;
-    contactoAEditar.apellidoP = apellidoPEditado;
-    contactoAEditar.apellidoM = apellidoMEditado;
-    contactoAEditar.fechaNac = fechaNacEditado;
-    contactoAEditar.email = emailEditado;
-    contactoAEditar.direccion = direccionEditado;
-    contactoAEditar.telefono = telefonoEditado;
-
-    // Actualizar el contacto editado en el localStorage
-    const contactos = JSON.parse(localStorage.getItem('contactos'));
-    const index = contactos.findIndex((c) => c.nombre === nombre);
-    contactos[index] = {
-      nombre: nombreEditado,
-      apellidoP: apellidoPEditado,
-      apellidoM: apellidoMEditado,
-      fechaNac: fechaNacEditado,
-      email: emailEditado,
-      direccion: direccionEditado,
-      telefono: telefonoEditado,
-    };
-    localStorage.setItem('contactos', JSON.stringify(contactos));
-
-    // Actualizar la lista de contactos en la interfaz de usuario
-    actualizarListaContactos();
-
-    // Eliminar el botón "Guardar"
-    guardarBtn.parentNode.removeChild(guardarBtn);
-
-    limpiarCajas();
+const contacForm = document.getElementById('formcontactos');
+//Enviar los datos al Firestore
+document.addEventListener('DOMContentLoaded', async () => {
+  onGetContacto((querySnapshot) =>{
+    let html = "";
+    querySnapshot.forEach((doc) =>{
+      const task = doc.data();
+      html += `
+          <div>
+            <p>${task.nombre}</p>
+            <p>${task.apellidoP}</p>
+            <p>${task.apellidoM}</p>
+            <p>${task.fechaN}</p>
+            <p>${task.email}</p>
+            <p>${task.direccion}</p>
+            <p>${task.telefono}</p>
+            <button class ='btn-delete' data-id="${doc.id}">Delete</button>
+            <button class ='btn-edit' data-id="${doc.id}">Editar</button>
+          </div>
+      `;
+    });
+    listaContactos.innerHTML = html;
+    const btnsDelete = listaContactos.querySelectorAll('.btn-delete')
+    btnsDelete.forEach((btn) => {
+      btn.addEventListener('click', ({target: {dataset}}) => {
+        deleteContacto(dataset.id);
+      });
+    });
+    const btnsEditar = listaContactos.querySelectorAll('.btn-edit');
+    btnsEditar.forEach((btn) => {
+      btn.addEventListener('click', async (e) => {
+        const doc = await getContacto(e.target.dataset.id);
+        const task = doc.data();
+        contacForm['nombre'].value = task.nombre;
+        contacForm['apellidoP'].value = task.apellidoP;
+        contacForm['apellidoM'].value = task.apellidoM;
+        contacForm['fechaNac'].value = task.fechaN;
+        contacForm['email'].value = task.email;
+        contacForm['direccion'].value = task.direccion;
+        contacForm['telefono'].value = task.telefono;
+        editStatus = true;
+        id = doc.id;
+        formcontactos['agregar'].innerText = 'Actualizar';
+      });
+    });
   });
-
-  // Agregar el botón "Guardar" fuera del formulario
-  contacForm.parentNode.insertBefore(guardarBtn, contacForm.nextSibling);
-}
-function actualizarListaContactos(){
-    
-    listaContactos.innerHTML = '';
-    miAgenda.contactos.forEach((contacto) => {
-        const li = document.createElement('li');
-        li.innerHTML = `
-          <li class="contact" id="lista-contactos">
-              <h5 class="card-title"><span id="nombre">${contacto.nombre}</span> ${contacto.apellidoP} ${contacto.apellidoM}</h5>
-              <p>Fecha de nacimiento: ${contacto.fechaNac}</p>
-              <p>Email: ${contacto.email}</p>
-              <p>Dirección: ${contacto.direccion}</p>
-              <p class="telefono">Teléfono: ${contacto.telefono}</p>
-              <button class="btn btn-success" id="editar" onclick="editarContacto('${contacto.nombre}', '${contacto.apellidoP}', '${contacto.apellidoM}', '${contacto.fechaNac}', '${contacto.email}', '${contacto.direccion}', '${contacto.telefono}')">🗑 Editar</button>
-  
-              <button class="btn btn-danger" id="eliminar" onclick="eliminarContacto('${contacto.nombre}')">🖉 Eliminar</button>
-          </li>
-  
-        `;
-    // Agregar el evento click al elemento de la lista
-    li.addEventListener('click', () => {
-      // Obtener el nombre del contacto y mostrarlo en la consola
-      const nombreContacto = li.querySelector('#nombre').textContent;
-      console.log(nombreContacto);
-    });
-  
-  
-        listaContactos.appendChild(li);
-    });
+});
+contacForm.addEventListener('submit', (e) => {
+  event.preventDefault();
+  const name = contacForm['nombre']
+  const lastnameP = contacForm['apellidoP']
+  const lastnameM = contacForm['apellidoM']
+  const fechaN = contacForm['fechaNac']
+  const email = contacForm['email']
+  const address = contacForm['direccion']
+  const phone = contacForm['telefono'] 
+  if(!editStatus){
+    saveTask(name.value,lastnameP.value,lastnameM.value,fechaN.value,email.value,address.value,phone.value)
   }
-function limpiarCajas() {
-    document.getElementById('nombre').value = '';
-    document.getElementById('apellidoP').value = '';
-    document.getElementById('apellidoM').value = '';
-    document.getElementById('fechaNac').value = '';
-    document.getElementById('email').value = '';
-    document.getElementById('direccion').value = '';
-    document.getElementById('telefono').value = '';
-}
+  else{
+    editContacto(id,{
+      nombre :nombre.value,
+      apellidoP: apellidoP.value,
+      apellidoM: apellidoM.value,
+      fechaN: fechaN.value,
+      email: email.value,
+      direccion: direccion.value,
+      telefono: telefono.value})
+      editStatus = false;
+  }
+  formcontactos.reset();
+});
+

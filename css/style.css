@@ -65,3 +65,7 @@ button:hover {
     background-color: #fff; /* Cambia el color de fondo del botón a blanco */
     color: #007bff; /* Cambia el color del texto a azul */
 }
+td button {
+    display: inline-block;
+    margin-right: 5px;
+}

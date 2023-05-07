@@ -50,20 +50,22 @@
     <main>
         <div class="container my-5">
             <h2>Contactos:</h2>
-            <table id="contactos">
-              <thead>
-                <tr>
-                  <th>Nombre</th>
-                  <th>Apellido Paterno</th>
-                  <th>Apellido Materno</th>
-                  <th>Fecha Nacimiento</th>
-                  <th>Email</th>
-                  <th>Direccion</th>
-                  <th>Teléfono</th>
-                </tr>
-              </thead>
-            </table>
-            <button onclick="descargarContactos()">Descargar contactos</button>
+              <table id="tablacontactos">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Apellido Paterno</th>
+                    <th>Apellido Materno</th>
+                    <th>Fecha Nacimiento</th>
+                    <th>Email</th>
+                    <th>Direccion</th>
+                    <th>Teléfono</th>
+                  </tr>
+                </thead>
+                <tbody id="tbodyContactos">
+                </tbody>
+              </table>
+            <button id = "btn-descargar-contactos" onclick="descargarContactos()">Descargar contactos</button>
           </div>
 
     </main>
@@ -82,8 +84,7 @@
     </footer>
 
     <!--Llamada a los archivos js-->
-    <script src="js/Agenda.js"></script>
-    <script src="js/Contactos.js"></script>
+    <script type="module" src="js/Contactos.js"></script>
     
     <!-- Bootstrap JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>   

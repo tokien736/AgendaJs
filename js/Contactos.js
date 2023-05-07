@@ -1,42 +1,62 @@
-// Obtener los datos del LocalStorage
-const contactos = JSON.parse(localStorage.getItem('contactos')) || [];
+import {
+  saveTask,getTasks,onGetContacto,deleteContacto,getContacto,editContacto,
+} from "./firebase.js";
+let editStatus = false;
+let id = "";
 
-// Obtener la tabla
-const tabla = document.getElementById('contactos');
-
-// Llenar la tabla con los datos
-contactos.forEach((contacto) => {
-  const fila = document.createElement('tr');
-  fila.innerHTML = `
-    <td>${contacto.nombre}</td>
-    <td>${contacto.apellidoP}</td>
-    <td>${contacto.apellidoM}</td>
-    <td>${contacto.fechaNac}</td>
-    <td>${contacto.email}</td>
-    <td>${contacto.direccion}</td>
-    <td>${contacto.telefono}</td>
-  `;
-  tabla.appendChild(fila);
+const CuerpoLista = document.getElementById('tbodyContactos')
+document.addEventListener('DOMContentLoaded', async () => {
+  onGetContacto((querySnapshot) =>{
+    let html = "";
+    querySnapshot.forEach((doc) =>{
+      const task = doc.data();
+      html += `
+          <tr>
+            <td>${task.nombre}</td>
+            <td>${task.apellidoP}</td>
+            <td>${task.apellidoM}</td>
+            <td>${task.fechaN}</td>
+            <td>${task.email}</td>
+            <td>${task.direccion}</td>
+            <td>${task.telefono}</td>
+            <td>
+              <button class="btn-delete" data-id="${doc.id}">Eliminar</button>
+            </td>
+          </tr>
+      `;
+    });
+    CuerpoLista.innerHTML = html;
+    const btnsDelete = CuerpoLista.querySelectorAll('.btn-delete')
+    btnsDelete.forEach((btn) => {
+      btn.addEventListener('click', ({target: {dataset}}) => {
+        deleteContacto(dataset.id);
+      });
+    });
+    //Editar
+  });
+  
 });
-function descargarContactos() {
-  const contactos = JSON.parse(localStorage.getItem('contactos'));
-  let textoContactos = '';
-
-  for (const contacto of contactos) {
-    textoContactos += `Nombre: ${contacto.nombre}\n`;
-    textoContactos += `Apellido Paterno: ${contacto.apellidoP}\n`;
-    textoContactos += `Apellido Materno: ${contacto.apellidoM}\n`;
-    textoContactos += `Fecha Nacimiento: ${contacto.fechaNac}\n`;
-    textoContactos += `Email: ${contacto.email}\n`;
-    textoContactos += `Direccion: ${contacto.direccion}\n`;
-    textoContactos += `Teléfono: ${contacto.telefono}\n\n`;
+document.addEventListener('DOMContentLoaded', function() {
+  function descargarContactos() {
+    const data = [];
+    getTasks().then((querySnapshot) => {
+      querySnapshot.forEach((doc) => {
+        const contacto = doc.data();
+        const contactoTxt = `Nombre: ${contacto.nombre}, Apellido paterno: ${contacto.apellidoP}, Apellido materno: ${contacto.apellidoM}, Fecha de nacimiento: ${contacto.fechaN}, Email: ${contacto.email}, Dirección: ${contacto.direccion}, Teléfono: ${contacto.telefono}`;
+        data.push(contactoTxt);
+      });
+      const txt = data.join("\n");
+      const a = document.createElement("a");
+      const file = new Blob([txt], { type: "text/plain" });
+      a.href = URL.createObjectURL(file);
+      a.download = "contactos.txt";
+      a.click();
+    }).catch((error) => {
+      console.error("Error al obtener los contactos: ", error);
+    });
   }
+  const btnDescargar = document.getElementById('btn-descargar-contactos');
+  btnDescargar.onclick = descargarContactos;  
+});
 
-  const enlace = document.createElement('a');
-  enlace.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textoContactos));
-  enlace.setAttribute('download', 'contactos.txt');
-  enlace.style.display = 'none';
-  document.body.appendChild(enlace);
-  enlace.click();
-  document.body.removeChild(enlace);
-}
+
